@@ -1,12 +1,16 @@
 package com.nahuel.Tinder.entidades;
 
 import javax.persistence.Entity; //@entity para persistir la entidad Zona
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 public class Zona {
     
     @Id //identificador univoco
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2") 
     private String id;
     private String nombre;
     private String descripcion;

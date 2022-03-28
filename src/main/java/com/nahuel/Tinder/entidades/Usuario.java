@@ -2,19 +2,27 @@ package com.nahuel.Tinder.entidades;
 
 import java.util.Date;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 public class Usuario {
     
     @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2") //esto geneta un id en formato String unico!
     private String id;
     private String nombre;
     private String apellido;
     private String mail;
     private String clave;
+    
+    @ManyToOne
+    private Zona zona; //muchos usuarios pueden tener una zona
     
     @Temporal(TemporalType.TIMESTAMP) // de que manera se guarda esta fecha en la base de datos
     private Date alta;
@@ -75,6 +83,14 @@ public class Usuario {
 
     public void setBaja(Date baja) {
         this.baja = baja;
+    }
+
+    public Zona getZona() {
+        return zona;
+    }
+
+    public void setZona(Zona zona) {
+        this.zona = zona;
     }
     
 }

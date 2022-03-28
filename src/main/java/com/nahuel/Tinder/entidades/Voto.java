@@ -2,15 +2,26 @@ package com.nahuel.Tinder.entidades;
 
 import java.util.Date;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 public class Voto {
     
     @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2") 
     private String id;
+    
+    @ManyToOne
+    private Mascota macota1; // mascote que origina el voto
+    
+    @ManyToOne
+    private Mascota mascota2; // mascota que recibe el voto
     
     @Temporal(TemporalType.TIMESTAMP)
     private Date fecha;
@@ -39,6 +50,22 @@ public class Voto {
 
     public void setRespuesta(Date respuesta) {
         this.respuesta = respuesta;
+    }
+
+    public Mascota getMacota1() {
+        return macota1;
+    }
+
+    public void setMacota1(Mascota macota1) {
+        this.macota1 = macota1;
+    }
+
+    public Mascota getMascota2() {
+        return mascota2;
+    }
+
+    public void setMascota2(Mascota mascota2) {
+        this.mascota2 = mascota2;
     }
     
 }
