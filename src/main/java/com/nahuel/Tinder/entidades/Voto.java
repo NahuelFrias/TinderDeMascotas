@@ -1,5 +1,6 @@
 package com.nahuel.Tinder.entidades;
 
+import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,7 +11,7 @@ import javax.persistence.TemporalType;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-public class Voto {
+public class Voto implements Serializable {
     
     @Id
     @GeneratedValue(generator = "uuid")
@@ -26,7 +27,7 @@ public class Voto {
     @Temporal(TemporalType.TIMESTAMP)
     private Date fecha;
     @Temporal(TemporalType.TIMESTAMP)
-    private Date respuesta;
+    private Date respuesta; //respuesta del voto
     
     public String getId() {
         return id;

@@ -1,5 +1,6 @@
 package com.nahuel.Tinder.servicios;
 
+import com.nahuel.Tinder.entidades.Foto;
 import com.nahuel.Tinder.entidades.Mascota;
 import com.nahuel.Tinder.entidades.Usuario;
 import com.nahuel.Tinder.enumeraciones.Sexo;
@@ -10,6 +11,7 @@ import java.util.Date;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class MascotaServicio {
@@ -18,8 +20,10 @@ public class MascotaServicio {
     private UsuarioRepositorio usuarioRepositorio;
     @Autowired
     private MascotaRepositorio mascotaRepositorio;
+    @Autowired
+    private FotoServices fotoServicio;
     
-    public void agregarMascota(String idUsuario, String nombre, Sexo sexo) throws ErrorServicio{
+    public void agregarMascota(MultipartFile archivo, String idUsuario, String nombre, Sexo sexo) throws ErrorServicio{
         
         Usuario usuario = usuarioRepositorio.findById(idUsuario).get();
         
@@ -30,10 +34,13 @@ public class MascotaServicio {
         mascota.setSexo(sexo);
         mascota.setAlta(new Date());
         
+        Foto foto = fotoServicio.guardar(archivo);
+        mascota.setFoto(foto);
+        
         mascotaRepositorio.save(mascota);
     }
     
-    public void modificar(String idUsuario, String idMascota, String nombre, Sexo sexo) throws ErrorServicio{
+    public void modificar(MultipartFile archivo, String idUsuario, String idMascota, String nombre, Sexo sexo) throws ErrorServicio{
         
         validar(nombre, sexo);
         
@@ -43,6 +50,13 @@ public class MascotaServicio {
             if(mascota.getUsuario().getId().equals(idUsuario)){
                 mascota.setNombre(nombre);
                 mascota.setSexo(sexo);
+                
+                String idFoto = null;
+                if(mascota.getFoto() != null){
+                    idFoto = mascota.getFoto().getId();
+                }
+                Foto foto = fotoServicio.actualizar(idFoto, archivo);
+                mascota.setFoto(foto);
                 
                 mascotaRepositorio.save(mascota);
             } else {

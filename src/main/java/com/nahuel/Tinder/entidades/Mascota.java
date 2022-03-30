@@ -1,6 +1,7 @@
 package com.nahuel.Tinder.entidades;
 
 import com.nahuel.Tinder.enumeraciones.Sexo;
+import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -8,12 +9,13 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-public class Mascota {
+public class Mascota implements Serializable {
         
     @Id
     @GeneratedValue(generator = "uuid")
@@ -26,6 +28,9 @@ public class Mascota {
     
     @ManyToOne
     private Usuario usuario;
+    
+    @OneToOne
+    private Foto foto;
     
     @Temporal(TemporalType.TIMESTAMP)
     private Date alta;
@@ -78,6 +83,14 @@ public class Mascota {
 
     public void setSexo(Sexo sexo) {
         this.sexo = sexo;
+    }
+
+    public Foto getFoto() {
+        return foto;
+    }
+
+    public void setFoto(Foto foto) {
+        this.foto = foto;
     }
     
 }

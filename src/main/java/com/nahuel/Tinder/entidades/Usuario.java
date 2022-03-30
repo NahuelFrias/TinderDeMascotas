@@ -1,16 +1,18 @@
 package com.nahuel.Tinder.entidades;
 
+import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-public class Usuario {
+public class Usuario implements Serializable {
     
     @Id
     @GeneratedValue(generator = "uuid")
@@ -20,6 +22,9 @@ public class Usuario {
     private String apellido;
     private String mail;
     private String clave;
+    
+    @OneToOne
+    private Foto foto;
     
     @ManyToOne
     private Zona zona; //muchos usuarios pueden tener una zona
@@ -91,6 +96,14 @@ public class Usuario {
 
     public void setZona(Zona zona) {
         this.zona = zona;
+    }
+
+    public Foto getFoto() {
+        return foto;
+    }
+
+    public void setFoto(Foto foto) {
+        this.foto = foto;
     }
     
 }
