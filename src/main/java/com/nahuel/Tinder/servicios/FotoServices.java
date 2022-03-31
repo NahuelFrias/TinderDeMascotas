@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class FotoServices {
@@ -15,6 +16,9 @@ public class FotoServices {
     FotoRepositorio fotoRepositorio;
     
     // este metodo retorna la foto creada y persistida
+    @Transactional /** si el metodo se ejecuta se hace un commit a la b.d. y se aplican los cambios
+     * si salta alguna excepcion, se vuelve atras y no se aplican cambios a la b.d
+     */
     public Foto guardar (MultipartFile archivo) throws ErrorServicio{// MultipartFile es el archivo donde se guarda la foto
         
         if( archivo != null){
@@ -32,6 +36,7 @@ public class FotoServices {
         return null;
     }
     
+    @Transactional
     public Foto actualizar (String idFoto, MultipartFile archivo) throws ErrorServicio{
        
          if( archivo != null){

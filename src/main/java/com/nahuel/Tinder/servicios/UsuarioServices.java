@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -26,7 +27,12 @@ public class UsuarioServices implements UserDetailsService { // autentizar usuar
     private UsuarioRepositorio usuarioRepositorio;
     @Autowired
     private FotoServices fotoServicio;
+    @Autowired
+    private NotificacionServices notificaciónServicio;
 
+    @Transactional /** si el metodo se ejecuta se hace un commit a la b.d. y se aplican los cambios
+     * si salta alguna excepcion, se vuelve atras y no se aplican cambios a la b.d
+     */
     public void registrar(MultipartFile archivo, String nombre, String apellido, String mail, String clave) throws ErrorServicio {
 
         validar(nombre, apellido, mail, clave);
@@ -46,9 +52,13 @@ public class UsuarioServices implements UserDetailsService { // autentizar usuar
         usuario.setFoto(foto);
 
         usuarioRepositorio.save(usuario);
+        
+        // damos la bienvenida por Mail
+        notificaciónServicio.enviar("Bienvenido al Tinder de Mascotas!", "Tinder de Mascotas", usuario.getMail());
     }
 
     // necesito el id para buscar en la base de datos al usuario
+    @Transactional
     public void modificar(MultipartFile archivo, String id, String nombre, String apellido, String mail, String clave) throws ErrorServicio {
 
         validar(nombre, apellido, mail, clave);
@@ -77,6 +87,7 @@ public class UsuarioServices implements UserDetailsService { // autentizar usuar
         }
     }
 
+    @Transactional
     public void habilitar(String id) throws ErrorServicio {
 
         Optional<Usuario> respuesta = usuarioRepositorio.findById(id);
@@ -90,6 +101,7 @@ public class UsuarioServices implements UserDetailsService { // autentizar usuar
 
     }
 
+    @Transactional
     public void deshabilitar(String id) throws ErrorServicio {
 
         Optional<Usuario> respuesta = usuarioRepositorio.findById(id);
