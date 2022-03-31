@@ -48,7 +48,7 @@ public class VotoServices {
             voto.setMascota2(mascota2);
             
             // notificamos el voto
-            notificacionServicio.enviar("Tu mascota ha sido votada!", "Tinder de Mascotas", mascota2.getUsuario().getMail());
+            //notificacionServicio.enviar("Tu mascota ha sido votada!", "Tinder de Mascotas", mascota2.getUsuario().getMail());
         } else {
             throw new ErrorServicio("No se encontró la mascota!");
         }
@@ -64,7 +64,7 @@ public class VotoServices {
             if(voto.getMascota2().getUsuario().getId().equals(idUsuario)){
                 voto.setRespuesta(new Date());
                 // notificamos el voto
-                notificacionServicio.enviar("Tu voto ha sido correspondido!", "Tinder de Mascotas", voto.getMacota1().getUsuario().getMail());
+                //notificacionServicio.enviar("Tu voto ha sido correspondido!", "Tinder de Mascotas", voto.getMacota1().getUsuario().getMail());
                 votoRepositorio.save(voto);
             } else {
                 throw new ErrorServicio("No tiene permisos suficientes!");

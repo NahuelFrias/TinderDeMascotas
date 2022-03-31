@@ -54,7 +54,7 @@ public class UsuarioServices implements UserDetailsService { // autentizar usuar
         usuarioRepositorio.save(usuario);
         
         // damos la bienvenida por Mail
-        notificaciónServicio.enviar("Bienvenido al Tinder de Mascotas!", "Tinder de Mascotas", usuario.getMail());
+        //notificaciónServicio.enviar("Bienvenido al Tinder de Mascotas!", "Tinder de Mascotas", usuario.getMail());
     }
 
     // necesito el id para buscar en la base de datos al usuario
