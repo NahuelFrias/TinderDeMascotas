@@ -24,7 +24,7 @@ public class ConfiguracionesSeguridad extends WebSecurityConfigurerAdapter{
     // configuracion del manejador de seguridad de Spring security
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .userDetailsService(usuarioServicio) //le decimos cual es el servicio para auntenticar un cliente,
+                .userDetailsService(usuarioServicio) //le decimos cual es el servicio para auntenticar un usuario,
                 .passwordEncoder(new BCryptPasswordEncoder()); //luego de que encuentra el usuario le decimos cual es el encoder para comparar contraseñas
     }
 
@@ -46,6 +46,6 @@ public class ConfiguracionesSeguridad extends WebSecurityConfigurerAdapter{
                             .logoutSuccessUrl("/login?logout")//y nos redirige aca
                             .permitAll()
                 .and().csrf().disable();
-                //con estas lineas no me manda el parametro de logout y no llega el msj de deslogueado
+                
     }
 }

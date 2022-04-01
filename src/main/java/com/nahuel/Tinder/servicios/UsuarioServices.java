@@ -2,12 +2,15 @@ package com.nahuel.Tinder.servicios;
 
 import com.nahuel.Tinder.entidades.Foto;
 import com.nahuel.Tinder.entidades.Usuario;
+import com.nahuel.Tinder.entidades.Zona;
 import com.nahuel.Tinder.errores.ErrorServicio;
 import com.nahuel.Tinder.repositorios.UsuarioRepositorio;
+import com.nahuel.Tinder.repositorios.ZonaRepositorio;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,6 +21,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -29,22 +34,27 @@ public class UsuarioServices implements UserDetailsService { // autentizar usuar
     private FotoServices fotoServicio;
     @Autowired
     private NotificacionServices notificaciónServicio;
+    @Autowired
+    private ZonaRepositorio zonaRepositorio;
 
     @Transactional /** si el metodo se ejecuta se hace un commit a la b.d. y se aplican los cambios
      * si salta alguna excepcion, se vuelve atras y no se aplican cambios a la b.d
      */
-    public void registrar(MultipartFile archivo, String nombre, String apellido, String mail, String clave) throws ErrorServicio {
+    public void registrar(MultipartFile archivo, String nombre, String apellido, String mail, String clave1, String clave2, String idZona) throws ErrorServicio {
 
-        validar(nombre, apellido, mail, clave);
-
+        Zona zona = zonaRepositorio.getById(idZona);
+        
+        validar(nombre, apellido, mail, clave1, clave2, zona);
+        
         Usuario usuario = new Usuario();
         usuario.setNombre(nombre);
         usuario.setApellido(apellido);
         usuario.setMail(mail);
+        usuario.setZona(zona);
 
         // debo utilizar el mismo encriptador que utilizo con Spring Security en la app principal
         // cuando persisto al usuario lo hago con una clave encriptada
-        String encriptada = new BCryptPasswordEncoder().encode(clave);
+        String encriptada = new BCryptPasswordEncoder().encode(clave1);
         usuario.setClave(encriptada);
         usuario.setAlta(new Date());
 
@@ -59,9 +69,11 @@ public class UsuarioServices implements UserDetailsService { // autentizar usuar
 
     // necesito el id para buscar en la base de datos al usuario
     @Transactional
-    public void modificar(MultipartFile archivo, String id, String nombre, String apellido, String mail, String clave) throws ErrorServicio {
+    public void modificar(MultipartFile archivo, String id, String nombre, String apellido, String mail, String clave1, String clave2, String idZona) throws ErrorServicio {
 
-        validar(nombre, apellido, mail, clave);
+        Zona zona = zonaRepositorio.getById(idZona);
+        
+        validar(nombre, apellido, mail, clave1, clave2, zona);
 
         Optional<Usuario> respuesta = usuarioRepositorio.findById(id);
         if (respuesta.isPresent()) {
@@ -69,8 +81,9 @@ public class UsuarioServices implements UserDetailsService { // autentizar usuar
             usuario.setNombre(nombre);
             usuario.setApellido(apellido);
             usuario.setMail(mail);
+            usuario.setZona(zona);
             // encripto la clave
-            String encriptada = new BCryptPasswordEncoder().encode(clave);
+            String encriptada = new BCryptPasswordEncoder().encode(clave1);
             usuario.setClave(encriptada);
 
             // obtengo el id de la foto si es que existe
@@ -115,7 +128,7 @@ public class UsuarioServices implements UserDetailsService { // autentizar usuar
 
     }
 
-    private void validar(String nombre, String apellido, String mail, String clave) throws ErrorServicio {
+    private void validar(String nombre, String apellido, String mail, String clave1, String clave2, Zona zona) throws ErrorServicio {
         if (nombre == null || nombre.isEmpty()) {
             throw new ErrorServicio("El nombre no puede estar vacio!");
         }
@@ -125,8 +138,14 @@ public class UsuarioServices implements UserDetailsService { // autentizar usuar
         if (mail == null || mail.isEmpty()) {
             throw new ErrorServicio("El mail no puede estar vacio!");
         }
-        if (clave == null || clave.isEmpty() || clave.length() <= 6) {
+        if (clave1 == null || clave1.isEmpty() || clave1.length() <= 6) {
             throw new ErrorServicio("La clave debe tener al menos 6 digitos!");
+        }
+        if(!clave1.equals(clave2)){
+            throw new ErrorServicio("Las claves no coinciden!");
+        }
+        if(zona == null){
+            throw new ErrorServicio("No se encontro la zona solicitada");
         }
     }
 
@@ -140,12 +159,14 @@ public class UsuarioServices implements UserDetailsService { // autentizar usuar
             List<GrantedAuthority> permisos = new ArrayList<>();
             //creo los permisos
             //con este rol va a poder ingresar a algunos metodos
-            GrantedAuthority p1 = new SimpleGrantedAuthority("MODULO_FOTOS");
+            GrantedAuthority p1 = new SimpleGrantedAuthority("ROLE_USUARIO_REGISTRADO");
             permisos.add(p1);
-            GrantedAuthority p2 = new SimpleGrantedAuthority("MODULO_MASCOTAS");
-            permisos.add(p2);
-            GrantedAuthority p3 = new SimpleGrantedAuthority("MODULO_VOTOS");
-            permisos.add(p3);
+            
+            // recupero los atributos de la solicitud o request http
+            ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            HttpSession session = attr.getRequest().getSession(true); // solicito los datos de sesion de esa solicitud http
+            session.setAttribute("usuariosession", usuario); // guardo un usuario session en los datos de solicitud http, tengo mi objeto con los datos de mi usuario
+            
             //transformo al cliente en un cliente del dominio de Spring
             //nos pide usuario,clave y permisos
             User user = new User(usuario.getMail(), usuario.getClave(), permisos);
