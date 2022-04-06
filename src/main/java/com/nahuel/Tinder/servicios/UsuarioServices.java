@@ -99,6 +99,18 @@ public class UsuarioServices implements UserDetailsService { // autentizar usuar
             throw new ErrorServicio("No se encontro el usuario solicitado!");
         }
     }
+    
+    public Usuario buscarPorId(String id) throws ErrorServicio {
+
+        Optional<Usuario> respuesta = usuarioRepositorio.findById(id);
+
+        if (respuesta.isPresent()) {
+            Usuario usuario= respuesta.get();
+            return usuario;
+        } else {
+            throw new ErrorServicio("No se encontro el usuario buscado.");
+        }
+    }
 
     @Transactional
     public void habilitar(String id) throws ErrorServicio {
