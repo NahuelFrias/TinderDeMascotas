@@ -1,6 +1,7 @@
 package com.nahuel.Tinder.entidades;
 
 import com.nahuel.Tinder.enumeraciones.Sexo;
+import com.nahuel.Tinder.enumeraciones.Tipo;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Entity;
@@ -25,6 +26,9 @@ public class Mascota implements Serializable {
     
     @Enumerated(EnumType.STRING) //guarda en la b.d. el String "MACHO" o "HEMBRA"
     private Sexo sexo;
+    
+    @Enumerated(EnumType.STRING) 
+    private Tipo tipo;
     
     @ManyToOne
     private Usuario usuario;
@@ -91,6 +95,14 @@ public class Mascota implements Serializable {
 
     public void setFoto(Foto foto) {
         this.foto = foto;
+    }
+
+    public Tipo getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(Tipo tipo) {
+        this.tipo = tipo;
     }
     
 }

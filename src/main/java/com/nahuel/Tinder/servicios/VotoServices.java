@@ -17,6 +17,7 @@ public class VotoServices {
     private VotoRepositorio votoRepositorio;
     @Autowired
     private MascotaRepositorio mascotaRepositorio;
+
     @Autowired
     private NotificacionServices notificacionServicio;
     

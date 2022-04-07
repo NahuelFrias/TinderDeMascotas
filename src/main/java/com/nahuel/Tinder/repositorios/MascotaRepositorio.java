@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MascotaRepositorio extends JpaRepository<Mascota, String>{ //tipo Mascota, clave primaria String
-    
-    @Query("SELECT c FROM Mascota c WHERE c.usario.id = :id")
+
+    @Query("SELECT c FROM Mascota c WHERE c.usario.id = :id AND c.baja IS NULL")
     public List<Mascota> buscarMascotaPorUsuario (@Param("id") String id);
 }

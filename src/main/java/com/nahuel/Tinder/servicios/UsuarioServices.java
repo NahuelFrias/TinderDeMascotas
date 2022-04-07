@@ -32,6 +32,7 @@ public class UsuarioServices implements UserDetailsService { // autentizar usuar
     private UsuarioRepositorio usuarioRepositorio;
     @Autowired
     private FotoServices fotoServicio;
+    
     @Autowired
     private NotificacionServices notificaciónServicio;
     @Autowired

@@ -4,10 +4,12 @@ import com.nahuel.Tinder.entidades.Foto;
 import com.nahuel.Tinder.entidades.Mascota;
 import com.nahuel.Tinder.entidades.Usuario;
 import com.nahuel.Tinder.enumeraciones.Sexo;
+import com.nahuel.Tinder.enumeraciones.Tipo;
 import com.nahuel.Tinder.errores.ErrorServicio;
 import com.nahuel.Tinder.repositorios.MascotaRepositorio;
 import com.nahuel.Tinder.repositorios.UsuarioRepositorio;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-public class MascotaServicio {
+public class MascotaServices {
     
     @Autowired
     private UsuarioRepositorio usuarioRepositorio;
@@ -27,7 +29,7 @@ public class MascotaServicio {
     @Transactional /** si el metodo se ejecuta se hace un commit a la b.d. y se aplican los cambios
      * si salta alguna excepcion, se vuelve atras y no se aplican cambios a la b.d
      */
-    public void agregarMascota(MultipartFile archivo, String idUsuario, String nombre, Sexo sexo) throws ErrorServicio{
+    public void agregarMascota(MultipartFile archivo, String idUsuario, String nombre, Sexo sexo, Tipo tipo) throws ErrorServicio{
         
         Usuario usuario = usuarioRepositorio.findById(idUsuario).get();
         
@@ -36,6 +38,7 @@ public class MascotaServicio {
         Mascota mascota = new Mascota();
         mascota.setNombre(nombre);
         mascota.setSexo(sexo);
+        mascota.setTipo(tipo);
         mascota.setAlta(new Date());
         
         Foto foto = fotoServicio.guardar(archivo);
@@ -45,7 +48,7 @@ public class MascotaServicio {
     }
     
     @Transactional
-    public void modificar(MultipartFile archivo, String idUsuario, String idMascota, String nombre, Sexo sexo) throws ErrorServicio{
+    public void modificar(MultipartFile archivo, String idUsuario, String idMascota, String nombre, Sexo sexo, Tipo tipo) throws ErrorServicio{
         
         validar(nombre, sexo);
         
@@ -62,6 +65,7 @@ public class MascotaServicio {
                 }
                 Foto foto = fotoServicio.actualizar(idFoto, archivo);
                 mascota.setFoto(foto);
+                mascota.setTipo(tipo);
                 
                 mascotaRepositorio.save(mascota);
             } else {
@@ -90,6 +94,18 @@ public class MascotaServicio {
         }
     }
     
+     public Mascota buscarPorId(String id) throws ErrorServicio {
+
+        Optional<Mascota> respuesta = mascotaRepositorio.findById(id);
+
+        if (respuesta.isPresent()) {
+            return respuesta.get();
+            
+        } else {
+            throw new ErrorServicio("No se encontro la mascota buscada.");
+        }
+    }
+    
     private void validar(String nombre, Sexo sexo) throws ErrorServicio{
         
         if(nombre == null || nombre.isEmpty()){
@@ -99,6 +115,10 @@ public class MascotaServicio {
             throw new ErrorServicio("El sexo no puede estar vacio!");
         }
         
+    }
+
+    public List<Mascota> buscarMascotasPorUsuario(String id) {
+        return mascotaRepositorio.buscarMascotaPorUsuario(id);
     }
     
 }

@@ -21,7 +21,7 @@ public class FotoServices {
      */
     public Foto guardar (MultipartFile archivo) throws ErrorServicio{// MultipartFile es el archivo donde se guarda la foto
         
-        if( archivo != null){
+        if( archivo != null && archivo.isEmpty()){
             try {
                 Foto foto = new Foto();
                 foto.setMime(archivo.getContentType()); // seteo el tipo mime
